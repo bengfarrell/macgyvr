@@ -1,0 +1,27 @@
+<script src="./libs/three.min.js"></script>
+<script src="./libs/webvr-polyfill.js"></script>
+<script src="./libs/VRControls.js"></script>
+<script src="./libs/VREffect.js"></script>
+<script src="./libs/webvr-manager.js"></script>
+<script src="./emptyvrscene.js"></script>
+
+<script>
+    CCWCThreeJSVRScene.default.prototype.owner = (document._currentScript || document.currentScript).ownerDocument;
+    document.registerElement('ccwc-threejs-vrscene', CCWCThreeJSVRScene.default);
+</script>
+
+<template>
+    <style>
+        :host {
+            display: inline-block;
+        }
+
+        :host .threecontainer {
+            width: 100%;
+            height: 100%;
+            display: inline-block;
+        }
+    </style>
+
+    <div class="threecontainer"></div>
+</template>

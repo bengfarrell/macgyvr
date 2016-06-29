@@ -1,0 +1,33 @@
+{
+  "name": "ccwc-threejs-vrscene",
+  "version": "0.1.0",
+  "dependencies": {
+    "three": "^0.77.1",
+    "webcomponents.js": "^0.7.2",
+    "webvr-polyfill": "^0.9.14"
+  },
+  "devDependencies": {
+    "async": "^1.5.2",
+    "babel": "^5.8.21",
+    "babel-preset-es2015": "^6.0.12",
+    "babelify": "^7.2.0",
+    "browserify": "^13.0.0",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^5.2.0",
+    "gulp-esdoc": "^0.1.0",
+    "gulp-gh-pages": "^0.5.4",
+    "gulp-sourcemaps": "^1.5.2",
+    "install": "^0.8.1",
+    "npm": "^3.9.3",
+    "sensortag": "^1.2.2",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "websocket": "^1.0.23",
+    "webvr-boilerplate": "^0.4.3"
+  },
+  "browserify": {
+    "transform": [
+      "babelify"
+    ]
+  }
+}
