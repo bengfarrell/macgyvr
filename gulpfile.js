@@ -6,15 +6,15 @@ var browserify = require('browserify');
 var babelify = require('babelify');
 var source = require('vinyl-source-stream');
 
-gulp.task('emptyvrscene', function () {
+gulp.task('vrscene', function () {
     return browserify({
-        entries: 'src/emptyvrscene.es6',
+        entries: 'src/vrscene.es6',
         standalone: 'CCWCThreeJSVRScene',
         extensions: ['es2015'], debug: true})
         .transform(babelify)
         .bundle()
-        .pipe(source('emptyvrscene.js'))
+        .pipe(source('vrscene.js'))
         .pipe(gulp.dest('./'));
 });
 
-gulp.task('default', ['emptyvrscene']);
+gulp.task('default', ['vrscene']);

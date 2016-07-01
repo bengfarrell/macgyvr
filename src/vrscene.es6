@@ -37,11 +37,32 @@ export default class extends HTMLElement {
         this._sceneSetupCallback = null;
 
         /**
+         * objects in scene
+         * @type {Array}
+         * @private
+         */
+        this._sceneObjects = [];
+
+        /**
          * debug view
          * @type {boolean}
          * @private
          */
         this._debugView = false;
+
+        /**
+         * is inspectable (for ThreeJS inspector)
+         * @type {boolean}
+         * @private
+         */
+        this._inspectable = false;
+
+        /**
+         * scene initialized
+         * @type {boolean}
+         * @private
+         */
+        this._initialized = false;
     }
 
     /**
@@ -69,6 +90,25 @@ export default class extends HTMLElement {
     }
 
     /**
+     * add to scene
+     * @param objects
+     */
+    addObjects(objects) {
+        if (!objects.length) {
+            objects = [objects];
+        }
+
+        if (this._initialized) {
+            for (var c = 0; c < objects.length; c++) {
+                this._sceneObjects.push(objects[c]);
+                objects[c].create(this._collection, this._customCollection);
+            }
+        } else {
+            this._pendingObjects = objects;
+        }
+    }
+
+    /**
      * parse attributes on element
      * @private
      */
@@ -79,6 +119,10 @@ export default class extends HTMLElement {
 
         if (this.hasAttribute('debugview')) {
             this._debugView = true;
+        }
+
+        if (this.hasAttribute('inspectable')) {
+            this._inspectable = true;
         }
     };
 
@@ -125,6 +169,10 @@ export default class extends HTMLElement {
 
         this._collection.renderer.render( this._collection.scene, this._collection.camera );
 
+        for (var c = 0; c < this._sceneObjects.length; c++) {
+            this._sceneObjects[c].render(this._collection, this._customCollection);
+        }
+
         if (this._postRenderCallback) {
             this._postRenderCallback(this._collection, this._customCollection);
         }
@@ -164,6 +212,21 @@ export default class extends HTMLElement {
         if (this._sceneSetupCallback) {
             this._sceneSetupCallback(this._collection, this._customCollection);
         }
+
+        if (this._pendingObjects) {
+            for (var c = 0; c < this._pendingObjects.length; c++) {
+                var newobj = this._pendingObjects[c];
+                this._sceneObjects.push(newobj);
+                newobj.create(this._collection, this._customCollection);
+            }
+            this._pendingObjects = [];
+        }
+
+        if (this._inspectable) {
+            window.scene = this._collection.scene;
+        }
+
+        this._initialized = true;
     }
 
     onResize(event) {
