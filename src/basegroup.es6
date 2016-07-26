@@ -8,6 +8,14 @@ export default class BaseGroup {
          */
         this._group = new THREE.Object3D();
 
+        if (params && params.assets) {
+            // todo: determine when to use JSON Loader, OBJ loader, or whatever
+            var loader = new THREE.JSONLoader();
+            loader.load(params.assets, (geometry, materials) => {
+                this.onAssetsLoaded(geometry, materials);
+            });
+        }
+
         this.onInitialize(params);
     }
 
@@ -27,6 +35,7 @@ export default class BaseGroup {
     onCreate(scene, custom) {};
     onRender(scene, custom) {};
     onInitialize(params) {};
+    onAssetsLoaded(geometry, material) {};
 
     /**
      * on create scene (or earliest possible opportunity)
@@ -57,6 +66,14 @@ export default class BaseGroup {
      */
     get group() {
         return this._group;
+    }
+
+    /**
+     * get children of this group
+     * @returns {Array}
+     */
+    get children() {
+        return this._group.children;
     }
 
     /**

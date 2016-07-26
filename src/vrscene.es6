@@ -51,6 +51,13 @@ export default class extends HTMLElement {
         this._debugView = false;
 
         /**
+         * anti-alias threejs renderer
+         * @type {boolean}
+         * @private
+         */
+        this._antialias = false;
+
+        /**
          * is inspectable (for ThreeJS inspector)
          * @type {boolean}
          * @private
@@ -124,6 +131,10 @@ export default class extends HTMLElement {
         if (this.hasAttribute('inspectable')) {
             this._inspectable = true;
         }
+
+        if (this.hasAttribute('antialias')) {
+            this._antialias = true;
+        }
     };
 
     /**
@@ -184,7 +195,7 @@ export default class extends HTMLElement {
      */
     init3DScene() {
         this._collection.scene = new THREE.Scene();
-        this._collection.renderer = new THREE.WebGLRenderer( {antialias:true} );
+        this._collection.renderer = new THREE.WebGLRenderer( {antialias: this._antialias} );
         this._collection.renderer.setSize(window.innerWidth, window.innerHeight);
         this.dom.scene.appendChild( this._collection.renderer.domElement );
 
