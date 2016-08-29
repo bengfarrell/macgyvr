@@ -14,20 +14,34 @@ gulp.task('vrscene', function () {
         extensions: ['es2015'], debug: true})
         .transform(babelify)
         .bundle()
-        .pipe(source('vrscene.js'))
+        .pipe(source('src/vrscene.js'))
         .pipe(gulp.dest('./'));
 });
 
 gulp.task('libs', function() {
     return gulp.src([
-        'vrscene.js',
+        './src/vrscene.js',
+        './src/import.js',
+        './node_modules/webvr-polyfill/build/webvr-polyfill.js',
         './node_modules/three/build/three.min.js',
         './node_modules/three/examples/js/effects/VREffect.js',
         './node_modules/three/examples/js/controls/VRControls.js',
-        './node_modules/webvr-boilerplate/build/webvr-manager.js',
-        './node_modules/webvr-polyfill/build/webvr-polyfill.js'])
+        './node_modules/webvr-boilerplate/build/webvr-manager.js'])
         .pipe(concat('ccwc-threejs-vrscene.js'))
         .pipe(gulp.dest('./'));
 });
 
-gulp.task('default', ['vrscene', 'libs']);
+gulp.task('libs-debug', function() {
+    return gulp.src([
+        './src/vrscene.js',
+        './src/import.js',
+        './node_modules/webvr-polyfill/build/webvr-polyfill.js',
+        './node_modules/three/build/three.js',
+        './node_modules/three/examples/js/effects/VREffect.js',
+        './node_modules/three/examples/js/controls/VRControls.js',
+        './node_modules/webvr-boilerplate/build/webvr-manager.js'])
+        .pipe(concat('ccwc-threejs-vrscene-debug.js'))
+        .pipe(gulp.dest('./'));
+});
+
+gulp.task('default', ['vrscene', 'libs', 'libs-debug']);
