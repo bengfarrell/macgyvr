@@ -1,5 +1,5 @@
 {
-  "name": "ccwc-threejs-vrscene",
+  "name": "trivr",
   "version": "0.2.0",
   "dependencies": {
     "three": "^0.77.1",

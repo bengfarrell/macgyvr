@@ -10,7 +10,7 @@ var source = require('vinyl-source-stream');
 gulp.task('vrscene', function () {
     return browserify({
         entries: 'src/vrscene.es6',
-        standalone: 'CCWCThreeJSVRScene',
+        standalone: 'TrivrScene',
         extensions: ['es2015'], debug: true})
         .transform(babelify)
         .bundle()
@@ -27,7 +27,7 @@ gulp.task('libs', function() {
         './node_modules/three/examples/js/effects/VREffect.js',
         './node_modules/three/examples/js/controls/VRControls.js',
         './node_modules/webvr-boilerplate/build/webvr-manager.js'])
-        .pipe(concat('ccwc-threejs-vrscene.js'))
+        .pipe(concat('trivr.js'))
         .pipe(gulp.dest('./'));
 });
 
@@ -40,7 +40,7 @@ gulp.task('libs-debug', function() {
         './node_modules/three/examples/js/effects/VREffect.js',
         './node_modules/three/examples/js/controls/VRControls.js',
         './node_modules/webvr-boilerplate/build/webvr-manager.js'])
-        .pipe(concat('ccwc-threejs-vrscene-debug.js'))
+        .pipe(concat('trivr-debug.js'))
         .pipe(gulp.dest('./'));
 });
 
