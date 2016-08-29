@@ -152,15 +152,12 @@ export default class extends HTMLElement {
      */
     attachedCallback() {
         this.root = this;
-        this.dom = {};
         window.addEventListener('resize', event => this.onResize(event));
         window.addEventListener('vrdisplaypresentchange', event => this.onResize(event));
         var event = new CustomEvent('ready');
         this.dispatchEvent(event);
-        setTimeout( () => {
-            this.init3DScene();
-            this.render();
-        }, 100);
+        this.init3DScene();
+        this.render();
     }
 
     /**

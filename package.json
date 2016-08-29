@@ -1,6 +1,6 @@
 {
   "name": "ccwc-threejs-vrscene",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "dependencies": {
     "three": "^0.77.1",
     "webcomponents.js": "^0.7.22",
