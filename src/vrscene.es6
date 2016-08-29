@@ -151,13 +151,8 @@ export default class extends HTMLElement {
      * @private
      */
     attachedCallback() {
-        let template = this.owner.querySelector('template');
-        let clone = template.content.cloneNode(true);
-        this.root = this.createShadowRoot();
-        this.root.appendChild(clone);
-
+        this.root = this;
         this.dom = {};
-        this.dom.scene = this.root.querySelector('.threecontainer');
         window.addEventListener('resize', event => this.onResize(event));
         window.addEventListener('vrdisplaypresentchange', event => this.onResize(event));
         var event = new CustomEvent('ready');
@@ -197,7 +192,7 @@ export default class extends HTMLElement {
         this._collection.scene = new THREE.Scene();
         this._collection.renderer = new THREE.WebGLRenderer( {antialias: this._antialias} );
         this._collection.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.dom.scene.appendChild( this._collection.renderer.domElement );
+        this.root.appendChild( this._collection.renderer.domElement );
 
         this._collection.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
         this._collection.effect = new THREE.VREffect(this._collection.renderer);
@@ -262,3 +257,5 @@ export default class extends HTMLElement {
      */
     attributeChangedCallback(attr, oldVal, newVal) {};
 }
+CCWCThreeJSVRScene.default.prototype.owner = (document._currentScript || document.currentScript).ownerDocument;
+document.registerElement('ccwc-threejs-vrscene', CCWCThreeJSVRScene.default);
