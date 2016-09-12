@@ -170,7 +170,7 @@ export default class extends HTMLElement {
             this._preRenderCallback(this._collection, this._customCollection);
         }
 
-        this._collection.renderer.render( this._collection.scene, this._collection.camera );
+        this._collection.manager.render( this._collection.scene, this._collection.camera );
 
         for (var c = 0; c < this._sceneObjects.length; c++) {
             this._sceneObjects[c].render(this._collection, this._customCollection);

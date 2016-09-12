@@ -26,7 +26,8 @@ gulp.task('libs', function() {
         './node_modules/three/build/three.min.js',
         './node_modules/three/examples/js/effects/VREffect.js',
         './node_modules/three/examples/js/controls/VRControls.js',
-        './node_modules/webvr-boilerplate/build/webvr-manager.js'])
+        './node_modules/webvr-boilerplate/build/webvr-manager.js',
+        './src/webvrmanager-fix.js'])
         .pipe(concat('trivr.js'))
         .pipe(gulp.dest('./'));
 });
@@ -39,7 +40,9 @@ gulp.task('libs-debug', function() {
         './node_modules/three/build/three.js',
         './node_modules/three/examples/js/effects/VREffect.js',
         './node_modules/three/examples/js/controls/VRControls.js',
-        './node_modules/webvr-boilerplate/build/webvr-manager.js'])
+        './node_modules/webvr-boilerplate/build/webvr-manager.js',
+        './src/webvrmanager-fix.js'
+        ])
         .pipe(concat('trivr-debug.js'))
         .pipe(gulp.dest('./'));
 });
