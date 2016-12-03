@@ -58,6 +58,13 @@ export default class extends HTMLElement {
         this._antialias = false;
 
         /**
+         * disable VR renderer/effect
+         * @type {boolean}
+         * @private
+         */
+        this._disableVREffect = false;
+
+        /**
          * is inspectable (for ThreeJS inspector)
          * @type {boolean}
          * @private
@@ -135,6 +142,10 @@ export default class extends HTMLElement {
         if (this.hasAttribute('antialias')) {
             this._antialias = true;
         }
+
+        if (this.hasAttribute('disablevr')) {
+            this._disableVREffect = true;
+        }
     };
 
     /**
@@ -170,7 +181,11 @@ export default class extends HTMLElement {
             this._preRenderCallback(this._collection, this._customCollection);
         }
 
-        this._collection.manager.render( this._collection.scene, this._collection.camera );
+        if (this._disableVREffect) {
+            this._collection.renderer.render( this._collection.scene, this._collection.camera );
+        } else {
+            this._collection.manager.render( this._collection.scene, this._collection.camera );
+        }
 
         for (var c = 0; c < this._sceneObjects.length; c++) {
             this._sceneObjects[c].render(this._collection, this._customCollection);
@@ -192,12 +207,15 @@ export default class extends HTMLElement {
         this.root.appendChild( this._collection.renderer.domElement );
 
         this._collection.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
-        this._collection.effect = new THREE.VREffect(this._collection.renderer);
-        this._collection.effect.setSize(window.innerWidth, window.innerHeight);
         this._collection.controls = new THREE.VRControls(this._collection.camera);
         this._collection.controls.standing = true;
         this._collection.scene.add(this._collection.camera);
-        this._collection.manager = new WebVRManager(this._collection.renderer, this._collection.effect, {hideButton: false, isUndistorted:false});
+
+        if (!this._disableVREffect) {
+            this._collection.effect = new THREE.VREffect(this._collection.renderer);
+            this._collection.effect.setSize(window.innerWidth, window.innerHeight);
+            this._collection.manager = new WebVRManager(this._collection.renderer, this._collection.effect, {hideButton: false, isUndistorted:false});
+        }
 
         if (this._debugView) {
             this.axes = new THREE.AxisHelper(50);
@@ -233,7 +251,11 @@ export default class extends HTMLElement {
     }
 
     onResize(event) {
-        this._collection.effect.setSize(window.innerWidth, window.innerHeight);
+        if (!this._disableVREffect) {
+            this._collection.effect.setSize(window.innerWidth, window.innerHeight);
+        } else {
+            this._collection.renderer.setSize(window.innerWidth, window.innerHeight);
+        }
         this._collection.camera.aspect = window.innerWidth / window.innerHeight;
         this._collection.camera.updateProjectionMatrix();
     }
