@@ -2,9 +2,9 @@
   "name": "trivr",
   "version": "0.2.0",
   "dependencies": {
-    "three": "^0.77.1",
     "webcomponents.js": "^0.7.22",
-    "webvr-polyfill": "^0.9.14"
+    "webvr-polyfill": "^0.9.14",
+    "three": "^0.82.1"
   },
   "devDependencies": {
     "async": "^1.5.2",
@@ -14,14 +14,13 @@
     "browserify": "^13.0.0",
     "gulp": "^3.9.0",
     "gulp-babel": "^5.2.0",
+    "gulp-concat": "^2.6.0",
     "gulp-esdoc": "^0.1.0",
     "gulp-gh-pages": "^0.5.4",
     "gulp-sourcemaps": "^1.5.2",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "webvr-boilerplate": "^0.4.3",
-    "gulp-concat": "^2.6.0"
-
+    "webvr-boilerplate": "^0.4.3"
   },
   "browserify": {
     "transform": [

@@ -1,9 +1,17 @@
+import VRCamera from './vrcamera.es6';
+
 export default class extends HTMLElement {
     /**
      * initialize default class properties
      * @private
      */
     setProperties() {
+        /**
+         * current time stamp
+         * @type {number}
+         */
+        this.time = Date.now();
+
         /**
          * collection of scene objects
          * @type {{}}
@@ -44,25 +52,11 @@ export default class extends HTMLElement {
         this._sceneObjects = [];
 
         /**
-         * debug view
-         * @type {boolean}
-         * @private
-         */
-        this._debugView = false;
-
-        /**
          * anti-alias threejs renderer
          * @type {boolean}
          * @private
          */
         this._antialias = false;
-
-        /**
-         * disable VR renderer/effect
-         * @type {boolean}
-         * @private
-         */
-        this._disableVREffect = false;
 
         /**
          * is inspectable (for ThreeJS inspector)
@@ -131,20 +125,12 @@ export default class extends HTMLElement {
             this._sceneDataURI = this.getAttribute('scene');
         }
 
-        if (this.hasAttribute('debugview')) {
-            this._debugView = true;
-        }
-
         if (this.hasAttribute('inspectable')) {
             this._inspectable = true;
         }
 
         if (this.hasAttribute('antialias')) {
             this._antialias = true;
-        }
-
-        if (this.hasAttribute('disablevr')) {
-            this._disableVREffect = true;
         }
     };
 
@@ -175,10 +161,14 @@ export default class extends HTMLElement {
      * render
      */
     render() {
-        this._collection.controls.update();
+        var now = Date.now();
+        var timeObj = { now: now, delta: now - this.time };
+        this.time = now;
+
+        this._collection.vrcamera.render();
 
         if (this._preRenderCallback) {
-            this._preRenderCallback(this._collection, this._customCollection);
+            this._preRenderCallback( timeObj, this._collection, this._customCollection );
         }
 
         if (this._disableVREffect) {
@@ -188,11 +178,11 @@ export default class extends HTMLElement {
         }
 
         for (var c = 0; c < this._sceneObjects.length; c++) {
-            this._sceneObjects[c].render(this._collection, this._customCollection);
+            this._sceneObjects[c].render( timeObj, this._collection, this._customCollection );
         }
 
         if (this._postRenderCallback) {
-            this._postRenderCallback(this._collection, this._customCollection);
+            this._postRenderCallback( timeObj, this._collection, this._customCollection );
         }
         window.requestAnimationFrame(e => this.render());
     }
@@ -206,9 +196,9 @@ export default class extends HTMLElement {
         this._collection.renderer.setSize(window.innerWidth, window.innerHeight);
         this.root.appendChild( this._collection.renderer.domElement );
 
-        this._collection.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
-        this._collection.controls = new THREE.VRControls(this._collection.camera);
-        this._collection.controls.standing = true;
+
+        this._collection.vrcamera = new VRCamera();
+        this._collection.camera = this._collection.vrcamera.getThreeCamera();
         this._collection.scene.add(this._collection.camera);
 
         if (!this._disableVREffect) {

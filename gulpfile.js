@@ -18,6 +18,17 @@ gulp.task('vrscene', function () {
         .pipe(gulp.dest('./'));
 });
 
+gulp.task('vrscene-debug', function () {
+    return browserify({
+        entries: 'src/vrscene-debug.es6',
+        standalone: 'TrivrScene',
+        extensions: ['es2015'], debug: true})
+        .transform(babelify)
+        .bundle()
+        .pipe(source('src/vrscene-debug.js'))
+        .pipe(gulp.dest('./'));
+});
+
 gulp.task('libs', function() {
     return gulp.src([
         './src/vrscene.js',
@@ -34,7 +45,7 @@ gulp.task('libs', function() {
 
 gulp.task('libs-debug', function() {
     return gulp.src([
-        './src/vrscene.js',
+        './src/vrscene-debug.js',
         './src/import.js',
         './node_modules/webvr-polyfill/build/webvr-polyfill.js',
         './node_modules/three/build/three.js',
@@ -47,4 +58,4 @@ gulp.task('libs-debug', function() {
         .pipe(gulp.dest('./'));
 });
 
-gulp.task('default', ['vrscene', 'libs', 'libs-debug']);
+gulp.task('default', ['vrscene', 'vrscene-debug', 'libs', 'libs-debug']);
