@@ -6,6 +6,7 @@ var ghPages = require('gulp-gh-pages');
 var browserify = require('browserify');
 var babelify = require('babelify');
 var source = require('vinyl-source-stream');
+var runSequence = require('run-sequence');
 
 gulp.task('vrscene', function () {
     return browserify({
@@ -82,4 +83,6 @@ gulp.task('extras', function() {
         .pipe(gulp.dest('./'));
 });
 
-gulp.task('default', ['vrscene', 'vrscene-debug', 'libs', 'libs-debug', 'extras']);
+gulp.task('default', function() {
+    runSequence( ['vrscene', 'vrscene-debug'], 'libs', 'libs-debug', 'extras');
+});
