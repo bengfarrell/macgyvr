@@ -16,7 +16,6 @@
     "gulp-esdoc": "^0.1.0",
     "gulp-gh-pages": "^0.5.4",
     "gulp-sourcemaps": "^1.5.2",
-    "open": "0.0.5",
     "run-sequence": "^1.2.2",
     "three": "^0.82.1",
     "vinyl-buffer": "^1.0.0",
@@ -34,8 +33,5 @@
     "transform": [
       "babelify"
     ]
-  },
-  "scripts": {
-    "editor": "node server.js"
   }
 }
