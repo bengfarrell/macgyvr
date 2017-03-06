@@ -1,0 +1,129 @@
+{
+  "metadata": {
+    "version": 4.4,
+    "type": "Object",
+    "generator": "Object3D.toJSON"
+  },
+  "geometries": [
+    {
+      "uuid": "430DE711-3ACD-4D57-AD4E-DF7D327D2D12",
+      "type": "BoxBufferGeometry",
+      "width": 1,
+      "height": 1,
+      "depth": 1
+    },
+    {
+      "uuid": "D24B30FD-96C4-401D-9DC7-99560F8D113E",
+      "type": "SphereBufferGeometry",
+      "radius": 1,
+      "widthSegments": 32,
+      "heightSegments": 16,
+      "phiStart": 0,
+      "phiLength": 6.283185307179586,
+      "thetaStart": 0,
+      "thetaLength": 3.141592653589793
+    }
+  ],
+  "materials": [
+    {
+      "uuid": "2BBA5C3E-2776-4293-A1E2-DBEF97BBC5F2",
+      "type": "MeshLambertMaterial",
+      "color": 16749643,
+      "emissive": 8526214,
+      "depthFunc": 3,
+      "depthTest": true,
+      "depthWrite": true,
+      "skinning": false,
+      "morphTargets": false
+    },
+    {
+      "uuid": "C9213B2C-A9B5-4B64-84ED-8583BA396CDE",
+      "type": "MeshStandardMaterial",
+      "color": 16777215,
+      "roughness": 0.5,
+      "metalness": 0.5,
+      "emissive": 41728,
+      "depthFunc": 3,
+      "depthTest": true,
+      "depthWrite": true,
+      "skinning": false,
+      "morphTargets": false
+    }
+  ],
+  "object": {
+    "uuid": "31517222-A9A7-4EAF-B5F6-60751C0BABA3",
+    "type": "Scene",
+    "name": "Scene",
+    "matrix": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "children": [
+      {
+        "uuid": "4141C180-3388-4FF3-B8FF-92215DCE4124",
+        "type": "Mesh",
+        "name": "Box 1",
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          -4.017345428466797,
+          1
+        ],
+        "geometry": "430DE711-3ACD-4D57-AD4E-DF7D327D2D12",
+        "material": "2BBA5C3E-2776-4293-A1E2-DBEF97BBC5F2"
+      },
+      {
+        "uuid": "D0B0281D-932A-48EB-8B74-896BDF98ABCE",
+        "type": "Mesh",
+        "name": "Sphere 2",
+        "matrix": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          -2.826284170150757,
+          -0.2831331193447113,
+          -5.883908748626709,
+          1
+        ],
+        "geometry": "D24B30FD-96C4-401D-9DC7-99560F8D113E",
+        "material": "C9213B2C-A9B5-4B64-84ED-8583BA396CDE"
+      }
+    ],
+    "background": 11184810
+  }
+}
