@@ -53,7 +53,6 @@ export default class BaseGroup {
         }
 
         if (this._config && this._config.scene) {
-            // todo: determine when to use JSON Loader, OBJ loader, or whatever
             var loader = new THREE.ObjectLoader();
             loader.load(this._config.scene, (loaded) => {
                 this.onJSONSceneLoaded(loaded);
@@ -70,6 +69,7 @@ export default class BaseGroup {
     /**
      * add object to scene
      * @param object
+     * @param name
      */
     add(object, name) {
         if (!name) {

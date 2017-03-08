@@ -156,6 +156,7 @@ export default class extends HTMLElement {
         this.root = this;
         window.addEventListener('resize', event => this.onResize(event));
         window.addEventListener('vrdisplaypresentchange', event => this.onResize(event));
+
         var event = new CustomEvent('ready');
         this.dispatchEvent(event);
         this.init3DScene();
@@ -208,7 +209,6 @@ export default class extends HTMLElement {
         this._collection.renderer = new THREE.WebGLRenderer( {antialias: this._antialias} );
         this._collection.renderer.setSize(window.innerWidth, window.innerHeight);
         this.root.appendChild( this._collection.renderer.domElement );
-
 
         this._collection.vrcamera = new VRCamera();
         this._collection.camera = this._collection.vrcamera.getThreeCamera();
