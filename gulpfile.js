@@ -48,6 +48,7 @@ gulp.task('playground', function() {
 
 gulp.task('libs', function() {
     return gulp.src([
+        './node_modules/webcomponents.js/webcomponents-lite.min.js',
         'vrscene.js',
         './src/import.js',
         './node_modules/webvr-polyfill/build/webvr-polyfill.js',
@@ -62,6 +63,7 @@ gulp.task('libs', function() {
 
 gulp.task('libs-debug', function() {
     return gulp.src([
+        './node_modules/webcomponents.js/webcomponents-lite.min.js',
         'vrscene-debug.js',
         './src/import.js',
         './node_modules/webvr-polyfill/build/webvr-polyfill.js',
@@ -78,6 +80,8 @@ gulp.task('libs-debug', function() {
 gulp.task('extras', function() {
     return gulp.src([
         './node_modules/createjs-tweenjs/lib/tweenjs-0.6.0.min.js',
+        './thirdpartylibs/daydream-controller.js/files/MadgwickAHRS.js',
+        './thirdpartylibs/daydream-controller.js/DaydreamController.js',
         ])
         .pipe(concat('macgyvr-extras.js'))
         .pipe(gulp.dest('./'));

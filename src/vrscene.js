@@ -71,30 +71,22 @@ export default class extends HTMLElement {
          * @private
          */
         this._initialized = false;
+
+        /**
+         * application scope
+         */
+        this._application;
     }
 
     /**
-     * set pre render callback
-     * @param cb
+     * register application scope
+     * @param scope
      */
-    set onPreRender(cb) {
-        this._preRenderCallback = cb;
-    }
-
-    /**
-     * set pre render callback
-     * @param cb
-     */
-    set onPostRender(cb) {
-        this._postRenderCallback = cb;
-    }
-
-    /**
-     * set pre render callback
-     * @param cb
-     */
-    set onCreate(cb) {
-        this._sceneSetupCallback = cb;
+    registerApplication(scope) {
+        this._application = scope;
+        if (this._initialized) {
+            this._application.onCreate(this, this._collection);
+        }
     }
 
     /**
@@ -181,8 +173,8 @@ export default class extends HTMLElement {
 
         this._collection.vrcamera.render();
 
-        if (this._preRenderCallback) {
-            this._preRenderCallback( this._collection, timeObj );
+        if (this._preRenderCallback && this._application) {
+            this._application.onPreRender(timeObj);
         }
 
         if (this._disableVREffect) {
@@ -195,8 +187,8 @@ export default class extends HTMLElement {
             this._sceneObjects[c].render(timeObj);
         }
 
-        if (this._postRenderCallback) {
-            this._postRenderCallback(timeObj);
+        if (this._postRenderCallback && this._application) {
+            this._application.onRender(timeObj);
         }
         window.requestAnimationFrame(e => this.render());
     }
@@ -235,8 +227,8 @@ export default class extends HTMLElement {
             this._collection.scene.add(this._collection.light);
         }
 
-        if (this._sceneSetupCallback) {
-            this._sceneSetupCallback(this._collection);
+        if (this._sceneSetupCallback && this._application) {
+            this._application.onCreate(this, this._collection);
         }
 
         if (this._pendingObjects) {
@@ -270,7 +262,6 @@ export default class extends HTMLElement {
      * @private
      */
     detachedCallback() {};
-
 
     /**
      * attributeChangedCallback
