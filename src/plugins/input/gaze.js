@@ -1,17 +1,16 @@
 export default class GazeInput {
-    constructor(sceneCollection, colliders) {
-        this.sceneCollection = sceneCollection;
-        this._colliders = colliders;
+    constructor(camera) {
+        this._camera = camera;
+        this.connected = false;
         this._callbacks = [];
         document.body.addEventListener('mousedown', (e) => this.onClick(e) );
     }
 
-    set colliderObjects(objs) {
-        this._colliders = objs;
-    }
-
-    get colliderObjects() {
-        return objs;
+    /**
+     * connect and start listening
+     */
+    start() {
+        this.connected = true;
     }
 
     /**
@@ -27,21 +26,24 @@ export default class GazeInput {
      */
     onClick(event) {
         for (var c = 0; c < this._callbacks.length; c++) {
-            var collisions = [];
-            if (this._colliders && this._colliders.length > 0) {
-                collisions = this.detect(this._colliders);
-            }
-            this._callbacks[c].apply(this, [collisions]);
+            this._callbacks[c].apply(this);
         }
+    }
+
+    /**
+     * get orientation of device
+     */
+    get orientation() {
+        return this._camera.quaternion;
     }
 
     /**
      * detect against possible objects
      * @param possibleObjects
      */
-    detect(possibleObjects) {
+    pointingAt(possibleObjects) {
         var raycaster = new THREE.Raycaster();
-        raycaster.setFromCamera( new THREE.Vector2(0, 0), this.sceneCollection.camera );
+        raycaster.setFromCamera( new THREE.Vector2(0, 0), this._camera );
         var collisions = raycaster.intersectObjects( possibleObjects );
         return collisions;
     }

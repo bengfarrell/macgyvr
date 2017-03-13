@@ -1,5 +1,6 @@
 export default class Daydream {
     constructor() {
+        this.connected = false;
         this._callbacks = [];
         this._controller = new DaydreamController();
         this._controller.onStateChange((state) => this.onControllerUpdate(state));
@@ -9,15 +10,19 @@ export default class Daydream {
             app: false,
             home: false,
             click: false,
-            touch: false
+            volumePlus: false,
+            volumeMinus: false,
+            xTouch: 0,
+            yTouch: 0
         };
     }
 
     /**
      * connect and start listening
      */
-    connect() {
+    start() {
         this._controller.connect();
+        this.connected = true;
     }
 
     /**
@@ -37,7 +42,7 @@ export default class Daydream {
             changed.push( { 'click': state.isClickDown });
         }
 
-        if (state.isAppDown !== this._buttons.click) {
+        if (state.isAppDown !== this._buttons.app) {
             this._buttons.app = state.isAppDown;
             changed.push( { 'app': state.isAppDown });
         }
@@ -47,7 +52,17 @@ export default class Daydream {
             changed.push( { 'home': state.isHomeDown });
         }
 
-        if (state.xTouch > 0 && state.yTouch > 0) {
+        if (state.isVolMinusDown !== this._buttons.volumeMinus) {
+            this._buttons.volumeMinus = state.isVolMinusDown;
+            changed.push( { 'volumeMinus': state.isVolMinusDown });
+        }
+
+        if (state.isVolPlusDown !== this._buttons.volumePlus) {
+            this._buttons.volumePlus = state.isVolPlusDown;
+            changed.push( { 'volumePlus': state.isVolPlusDown });
+        }
+
+        if (state.xTouch !== this._buttons.xTouch && state.yTouch !== this._buttons.yTouch) {
             changed.push( { 'touch': { x: state.xTouch, y: state.yTouch } });
         }
 
@@ -56,6 +71,17 @@ export default class Daydream {
                 this._callbacks[c].apply(this, [changed, state]);
             }
         }
+    }
+
+    /**
+     * get orientation of device
+     */
+    get orientation() {
+        var q = new THREE.Quaternion();
+        var sf = this._sensorfusion.getQuaternion();
+        sf.y -= Math.PI/2;
+        q = q.fromArray(sf);
+        return q;
     }
 
     /**
@@ -70,7 +96,7 @@ export default class Daydream {
      * detect against possible objects
      * @param possibleObjects
      */
-    detect(possibleObjects) {
+    pointingAt(possibleObjects) {
         var raycaster = new THREE.Raycaster();
         raycaster.setFromCamera( new THREE.Vector2(0, 0), this.sceneCollection.camera );
         var collisions = raycaster.intersectObjects( possibleObjects );
