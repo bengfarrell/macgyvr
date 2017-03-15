@@ -20,6 +20,11 @@ export default class extends HTMLElement {
         this._collection = {};
 
         /**
+         * current vr display
+         */
+        this._vrDisplay;
+
+        /**
          * scene prerender callback
          * @type {null}
          */
@@ -151,13 +156,25 @@ export default class extends HTMLElement {
 
         var event = new CustomEvent('ready');
         this.dispatchEvent(event);
+        this.setupStage();
         this.init3DScene();
-        this.render();
+    }
+    
+    setupStage() {
+        navigator.getVRDisplays().then( displays => this.onVRDisplays(displays));
+    }
+
+    onVRDisplays(displays) {
+        if (displays.length > 0) {
+            this._vrDisplay = displays[0];
+            console.log('my display', this._vrDisplay);
+            this._vrDisplay.requestAnimationFrame( () => this.render());
+        }
     }
 
     formatPage() {
-        document.body.style.width = '100vw';
-        document.body.style.height = '100vh';
+        document.body.style.width = '100%';
+        document.body.style.height = '100%';
         document.body.style.margin = '0';
         document.body.style.padding = '0';
         document.body.style.overflow = 'hidden';
@@ -190,7 +207,7 @@ export default class extends HTMLElement {
         if (this._postRenderCallback && this._application) {
             this._application.onRender(timeObj);
         }
-        window.requestAnimationFrame(e => this.render());
+        this._vrDisplay.requestAnimationFrame(e => this.render());
     }
 
     /**
