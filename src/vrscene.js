@@ -167,7 +167,6 @@ export default class extends HTMLElement {
     onVRDisplays(displays) {
         if (displays.length > 0) {
             this._vrDisplay = displays[0];
-            console.log('my display', this._vrDisplay);
             this._vrDisplay.requestAnimationFrame( () => this.render());
         }
     }
