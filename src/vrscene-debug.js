@@ -16,13 +16,6 @@ export default class extends VRScene {
         this._debugView = false;
 
         /**
-         * disable VR renderer/effect
-         * @type {boolean}
-         * @private
-         */
-        this._disableVREffect = false;
-
-        /**
          * out of body trigger key code (settable via element attributes)
          * @type {number}
          * @private
@@ -39,10 +32,6 @@ export default class extends VRScene {
 
         if (this.hasAttribute('debugview')) {
             this._debugView = true;
-        }
-
-        if (this.hasAttribute('disablevr')) {
-            this._disableVREffect = true;
         }
 
         if (this.hasAttribute('outofbodykeycode')) {

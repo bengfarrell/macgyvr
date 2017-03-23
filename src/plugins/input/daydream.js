@@ -1,7 +1,9 @@
-export default class Daydream {
-    constructor() {
-        this.connected = false;
-        this._callbacks = [];
+import BaseInput from './baseinput.js';
+
+export default class Daydream extends BaseInput {
+    constructor(camera) {
+        super();
+        this._camera = camera;
         this._controller = new DaydreamController();
         this._controller.onStateChange((state) => this.onControllerUpdate(state));
         this._sensorfusion = new MadgwickAHRS();
@@ -20,9 +22,8 @@ export default class Daydream {
     /**
      * connect and start listening
      */
-    start() {
-        this._controller.connect();
-        this.connected = true;
+    connect() {
+        this.createButton();
     }
 
     /**
@@ -67,10 +68,21 @@ export default class Daydream {
         }
 
         if (changed.length > 0) {
-            for (var c = 0; c < this._callbacks.length; c++) {
-                this._callbacks[c].apply(this, [changed, state]);
+            var event = { changed: changed, controllerstate: state };
+            if (this._pointables.length > 0) {
+                event.pointingat = this.pointingAt(this._pointables);
             }
+            this.dispatchEvent('button', { changed: changed, controllerstate: state });
         }
+    }
+
+    /**
+     * on click to connect controller
+     */
+    onConnectController() {
+        super.connect();
+        this._controller.connect();
+        this.dispatchEvent('connected');
     }
 
     /**
@@ -79,17 +91,10 @@ export default class Daydream {
     get orientation() {
         var q = new THREE.Quaternion();
         var sf = this._sensorfusion.getQuaternion();
-        sf.y -= Math.PI/2;
         q = q.fromArray(sf);
+        //var offset = new THREE.Quaternion( Math.PI/2, 0, 0);
+        //q = q.multiply(offset);
         return q;
-    }
-
-    /**
-     * add listener
-     * @param callback
-     */
-    addListener(callback) {
-        this._callbacks.push(callback);
     }
 
     /**
@@ -97,9 +102,66 @@ export default class Daydream {
      * @param possibleObjects
      */
     pointingAt(possibleObjects) {
+        if (!possibleObjects) {
+            possibleObjects = this._pointables;
+        }
+
+        var m = new THREE.Matrix4().makeRotationFromQuaternion(this.orientation);
+        var direction = new THREE.Vector3(0, 0, 1);
+        direction = direction.applyMatrix4(m);
+
         var raycaster = new THREE.Raycaster();
-        raycaster.setFromCamera( new THREE.Vector2(0, 0), this.sceneCollection.camera );
+        raycaster.set( this._camera.position, direction );
         var collisions = raycaster.intersectObjects( possibleObjects );
-        return collisions;
+        var objects = [];
+        for (var c = 0; c < collisions.length; c++) {
+            if (objects.indexOf(collisions[c].object) == -1) {
+                objects.push(collisions[c].object);
+            }
+        }
+        return { objects: objects, collisions: collisions };
     }
+
+    createButton() {
+        var button = document.createElement('img');
+        button.className = 'daydream-button';
+        button.src = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgOCAyNCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgOCAyNDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+LnN0MHtmaWxsOm5vbmU7c3Ryb2tlOiNGRkZGRkY7c3Ryb2tlLW1pdGVybGltaXQ6MTA7fS5zdDF7ZmlsbDpub25lO3N0cm9rZTojRkZGRkZGO3N0cm9rZS1taXRlcmxpbWl0OjEwO30uc3Qye2ZpbGw6I0ZGRkZGRjt9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMCwzLjdDMCwxLjcsMS43LDAsMy43LDBzMy44LDEuNywzLjgsMy44djE1LjZjMCwyLjEtMS43LDMuOC0zLjgsMy44UzAsMjEuNCwwLDE5LjNWMy43eiIvPjxjaXJjbGUgY2xhc3M9InN0MSIgY3g9IjMuNyIgY3k9IjkuNSIgcj0iMS41Ii8+PGNpcmNsZSBjbGFzcz0ic3QxIiBjeD0iMy43IiBjeT0iMTMuMSIgcj0iMS41Ii8+PGNpcmNsZSBjbGFzcz0ic3QyIiBjeD0iMy43IiBjeT0iMy43IiByPSIzLjciLz48L3N2Zz4=';
+        button.title = 'Connect to Daydream Controller';
+        var s = button.style;
+        s.position = 'absolute';
+        s.width = '24px';
+        s.height = '24px';
+        s.backgroundSize = 'cover';
+        s.backgroundColor = 'transparent';
+        s.border = 0;
+        s.userSelect = 'none';
+        s.webkitUserSelect = 'none';
+        s.MozUserSelect = 'none';
+        s.cursor = 'pointer';
+        s.padding = '12px';
+        s.zIndex = 1;
+        s.display = 'inline-block';
+        s.boxSizing = 'content-box';
+        s.bottom = 0;
+        s.left = 0;
+
+        // Prevent button from being selected and dragged.
+        button.draggable = false;
+        button.addEventListener('dragstart', function(e) {
+            e.preventDefault();
+        });
+
+        // Style it on hover.
+        button.addEventListener('mouseenter', function(e) {
+            s.filter = s.webkitFilter = 'drop-shadow(0 0 5px rgba(255,255,255,1))';
+        });
+        button.addEventListener('mouseleave', function(e) {
+            s.filter = s.webkitFilter = '';
+        });
+
+        // assign click event
+        button.addEventListener('click', e => this.onConnectController(e));
+
+        document.body.appendChild(button);
+    };
 }

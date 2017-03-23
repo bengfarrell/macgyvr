@@ -25,24 +25,6 @@ export default class extends HTMLElement {
         this._vrDisplay;
 
         /**
-         * scene prerender callback
-         * @type {null}
-         */
-        this._preRenderCallBack = null;
-
-        /**
-         * scene postrender callback
-         * @type {null}
-         */
-        this._postRenderCallBack = null;
-
-        /**
-         * scene setup callback
-         * @type {null}
-         */
-        this._sceneSetupCallback = null;
-
-        /**
          * objects in scene
          * @type {Array}
          * @private
@@ -90,6 +72,7 @@ export default class extends HTMLElement {
     registerApplication(scope) {
         this._application = scope;
         if (this._initialized) {
+
             this._application.onCreate(this, this._collection);
         }
     }
@@ -171,12 +154,39 @@ export default class extends HTMLElement {
         }
     }
 
+    /**
+     * take care of style and meta-tags
+     */
     formatPage() {
         document.body.style.width = '100%';
         document.body.style.height = '100%';
         document.body.style.margin = '0';
         document.body.style.padding = '0';
         document.body.style.overflow = 'hidden';
+
+        var meta = document.createElement('meta');
+        meta.charset = 'utf-8';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+
+        meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+
+        meta = document.createElement('meta');
+        meta.name = 'mobile-web-app-capable';
+        meta.content = 'yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+
+        meta = document.createElement('meta');
+        meta.name = 'apple-mobile-web-app-capable';
+        meta.content = 'yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+
+        meta = document.createElement('meta');
+        meta.name = 'apple-mobile-web-app-status-bar-style';
+        meta.content = 'black-translucent';
+        document.getElementsByTagName('head')[0].appendChild(meta);
     }
 
     /**
@@ -189,21 +199,17 @@ export default class extends HTMLElement {
 
         this._collection.vrcamera.render();
 
-        if (this._preRenderCallback && this._application) {
+        if (this._application) {
             this._application.onPreRender(timeObj);
         }
 
-        if (this._disableVREffect) {
-            this._collection.renderer.render( this._collection.scene, this._collection.camera );
-        } else {
-            this._collection.manager.render( this._collection.scene, this._collection.camera );
-        }
+        this._collection.manager.render( this._collection.scene, this._collection.camera );
 
         for (var c = 0; c < this._sceneObjects.length; c++) {
             this._sceneObjects[c].render(timeObj);
         }
 
-        if (this._postRenderCallback && this._application) {
+        if (this._application) {
             this._application.onRender(timeObj);
         }
         this._vrDisplay.requestAnimationFrame(e => this.render());
@@ -222,11 +228,9 @@ export default class extends HTMLElement {
         this._collection.camera = this._collection.vrcamera.getThreeCamera();
         this._collection.scene.add(this._collection.camera);
 
-        if (!this._disableVREffect) {
-            this._collection.effect = new THREE.VREffect(this._collection.renderer);
-            this._collection.effect.setSize(window.innerWidth, window.innerHeight);
-            this._collection.manager = new WebVRManager(this._collection.renderer, this._collection.effect, {hideButton: false, isUndistorted:false});
-        }
+        this._collection.effect = new THREE.VREffect(this._collection.renderer);
+        this._collection.effect.setSize(window.innerWidth, window.innerHeight);
+        this._collection.manager = new WebVRManager(this._collection.renderer, this._collection.effect, {hideButton: false, isUndistorted:false});
 
         if (this._debugView) {
             this.axes = new THREE.AxisHelper(50);
@@ -243,7 +247,9 @@ export default class extends HTMLElement {
             this._collection.scene.add(this._collection.light);
         }
 
-        if (this._sceneSetupCallback && this._application) {
+        if (this._application) {
+            this._application.sceneCollection = this._collection;
+            this._application.vrScene = this;
             this._application.onCreate(this, this._collection);
         }
 
@@ -264,11 +270,7 @@ export default class extends HTMLElement {
     }
 
     onResize(event) {
-        if (!this._disableVREffect) {
-            this._collection.effect.setSize(window.innerWidth, window.innerHeight);
-        } else {
-            this._collection.renderer.setSize(window.innerWidth, window.innerHeight);
-        }
+        this._collection.renderer.setSize(window.innerWidth, window.innerHeight);
         this._collection.camera.aspect = window.innerWidth / window.innerHeight;
         this._collection.camera.updateProjectionMatrix();
     }
