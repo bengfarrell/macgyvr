@@ -3,8 +3,8 @@ import AnimatedCube from '../objects/animatedcube.js';
 import Dome from '../objects/dome.js';
 
 export default class Main extends BaseApplication {
-    onCreate(scene, scenecollection) {
-        scene.addObjects([
+    onCreate(scene) {
+        this.add([
             new Dome(),
             new AnimatedCube()
         ]);

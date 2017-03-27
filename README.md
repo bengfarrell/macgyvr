@@ -1,4 +1,4 @@
 # macgyvr
-Duct tape, glue, and convenience code to hold ThreeJS and friends together in a ES6 Class based way for VR inspired a bit by Unity
+ES6 Class based prototyping for A-Frame VR. Because VR markup is cool, but code is neat, too.
 
 ![macgyvr](macgyvr.png)

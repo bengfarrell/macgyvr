@@ -1,14 +1,7 @@
 import Color from '../utils/color.js';
 
 export default class Tween {
-    constructor(group) {
-        if (!createjs) {
-            throw new Error('CreateJS Tween must be included in your build or linked via script to animate');
-            return;
-        }
-        group.addRenderHook( (scene, time) => this.onRender(scene, time));
-        this.animations = [];
-    }
+    constructor(group) {}
 
     /**
      * animate THREE.js mesh position property
@@ -37,8 +30,9 @@ export default class Tween {
 
         from = this.populateStartAnimationObject(from, options);
         from.animation.step.push( (step) => this.animateColorStep(step));
-        this.createTween(to, from, options);
-        this.animations.push(from);
+
+        var anim = this.createTween(to, from, options);
+        anim.start();
     }
 
     /**
@@ -52,8 +46,8 @@ export default class Tween {
         to = { x: to.x, y: to.y, z: to.z };
         from = this.populateStartAnimationObject(from, options);
         from.animation.step.push( (step) => this.animatePositionStep(step));
-        this.createTween(to, from, options);
-        this.animations.push(from);
+        var anim = this.createTween(to, from, options);
+        anim.start();
     }
 
     /**
@@ -63,18 +57,13 @@ export default class Tween {
      * @param options
      */
     animate(from, to, options) {
-        if (!createjs) {
-            throw new Error('CreateJS Tween must be included in your build or linked via script to animate');
-            return;
-        }
-
         if (!options.step) {
             throw new Error('Please define a "step" property on options to specify a callback for each animation update');
         }
 
         from = this.populateStartAnimationObject(from, to);
-        this.createTween(to, from, options);
-        this.animations.push(from);
+        var anim = this.createTween(to, from, options);
+        anim.start();
     }
 
     /**
@@ -104,9 +93,14 @@ export default class Tween {
      * @returns {Tween}
      */
     createTween(to, from, options) {
-        createjs.Tween.get(from, options)
+        return new TWEEN.Tween(from, options)
             .to(to, options.duration)
-            .call( function() {
+            .onUpdate(function (value) {
+                for (var d = 0; d < this.animation.step.length; d++) {
+                    this.animation.step[d].apply(this, [this]);
+                }
+            })
+            .onComplete( function() {
                 if (!this._loop) {
                     this.animation.animating = false;
                 }
@@ -135,18 +129,19 @@ export default class Tween {
     /**
      * animate render hook
      * @param time
-     * @param scene
      */
-    onRender(scene, time) {
+    /*onRender(time) {
         var running = [];
         for (var c = 0; c < this.animations.length; c++) {
             if (this.animations[c].animation.animating) {
                 running.push(this.animations[c]);
+                console.log(this.animations[c])
                 for (var d = 0; d < this.animations[c].animation.step.length; d++) {
-                    this.animations[c].animation.step[d].apply(this, [this.animations[c]]);
+                    this.animations[c].update();
+                    //this.animations[c].animation.step[d].apply(this, [this.animations[c]]);
                 }
             }
         }
         this.animations = running;
-    }
+    }*/
 }

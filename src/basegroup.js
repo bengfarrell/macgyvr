@@ -6,13 +6,12 @@ export default class BaseGroup {
          * @type {THREE.Object3D}
          * @private
          */
-        this._group = new THREE.Object3D();
-
-        /** additional render hooks we can add */
-        this._renderHooks = [];
+        this._group = new THREE.Group();
 
         this._config = params;
         this.onInitialize(params);
+
+        this.el = { isPlaying: true };
     }
 
     /**
@@ -41,14 +40,20 @@ export default class BaseGroup {
      */
     create(scene) {
         this._group.name = this.name;
-        this._sceneCollection = scene;
-        scene.scene.add(this._group);
+        scene.object3D.add(this._group);
 
         if (this._config && this._config.assets) {
             // todo: determine when to use JSON Loader, OBJ loader, or whatever
             var loader = new THREE.JSONLoader();
             loader.load(this._config.assets, (geometry, materials) => {
                 this.onAssetsLoaded(geometry, materials);
+            });
+        }
+
+        if (this._config && this._config.geometry) {
+            var loader = new THREE.BufferGeometryLoader();
+            loader.load(this._config.geometry, (geometry) => {
+                this.onAssetsLoaded(geometry);
             });
         }
 
@@ -77,10 +82,6 @@ export default class BaseGroup {
         }
         object.name = name;
         this._group.add(object);
-    }
-
-    addRenderHook(method) {
-        this._renderHooks.push(method);
     }
 
     /**
@@ -114,13 +115,10 @@ export default class BaseGroup {
     preRender() {}
 
     /**
-     * on render scene
+     * on a-frame component tick
      * @param time
      */
-    render(time) {
-        for (var c = 0; c < this._renderHooks.length; c++) {
-            this._renderHooks[c].apply(this, [time]);
-        }
+    tick(time) {
         this.onRender(time);
     }
 }
