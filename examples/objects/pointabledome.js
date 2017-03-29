@@ -18,8 +18,8 @@ export default class Dome extends BaseGroup {
      * @param time
      */
     onRender(time) {
-        if (this.sceneCollection.input.connected) {
-            var collisions = this.sceneCollection.input.pointingAt([this._mesh]).collisions;
+        if (this.scene.controller.connected) {
+            var collisions = this.scene.controller.pointingAt([this._mesh]).collisions;
             if (collisions.length > 0) {
                 this._particle.position.copy( collisions[0].point );
             }

@@ -30,5 +30,8 @@ export default class VirtualDayDream extends BaseGroup {
      * @param time
      */
     onRender(time) {
+        if (this._mesh && this.scene.controller) {
+            this._mesh.quaternion.copy(this.scene.controller.orientation);
+        }
     }
 }

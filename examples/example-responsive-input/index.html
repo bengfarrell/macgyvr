@@ -3,21 +3,23 @@
 <head>
     <title>Basic Application with interactable/pointable objects</title>
 
-    <script src="../../node_modules/browser-es-module-loader/dist/babel-browser-build.js"></script>
+    <!--<script src="../../node_modules/browser-es-module-loader/dist/babel-browser-build.js"></script>
     <script src="../../node_modules/browser-es-module-loader/dist/browser-es-module-loader.js"></script>
-    <script src="../../macgyvr-debug.js"></script>
-    <script src="../../macgyvr-extras.js"></script>
+    <script src="../../node_modules/aframe/dist/aframe-master.js"></script>
+    <script src="../../macgyvr-daydream.js"></script>-->
+
+    <script src="../../macgyvr-full-dev.js"></script>
 
 </head>
 <body>
-<macgyvr-scene inspectable autolight debugview outofbodykeycode="13"></macgyvr-scene>
+
+<a-scene></a-scene>
 
 <script>
     var loader = new BrowserESModuleLoader();
     loader.import('./main.js').then(function(App) {
-        new App.default(document.querySelector('macgyvr-scene'));
+        new App.default(document.querySelector('a-scene'));
     });
 </script>
-
 </body>
 </html>

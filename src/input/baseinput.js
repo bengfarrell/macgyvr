@@ -4,6 +4,7 @@ export default class BaseInput {
         this._callbacks = [];
         this._pointables = [];
         this._lastPointingAtList = [];
+        this.el = { isPlaying: true };
     }
 
     /**

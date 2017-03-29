@@ -1,5 +1,5 @@
 import BaseGroup from '../../src/basegroup.js';
-import Tween from '../../src/plugins/tween.js';
+import Animation from '../../src/utils/animation.js';
 
 export default class Cube extends BaseGroup {
     /**
@@ -10,12 +10,12 @@ export default class Cube extends BaseGroup {
         this._pointingAt = false;
         this._material = this.createMaterial();
         this._mesh = new THREE.Mesh(this.createGeometry(), this._material);
-        this.sceneCollection.input.addPointable(this._mesh);
-        this.sceneCollection.input.addListener('button', (type, event) => this.onClick(type, event));
+        this.scene.controller.addPointable(this._mesh);
+        this.scene.controller.addListener('button', (type, event) => this.onClick(type, event));
         this.add(this._mesh, 'cube');
         this.group.position.z = -20;
         this._mesh.position.x = -12;
-        this.tweener = new Tween(this);
+        this.animation = new Animation(this);
     }
 
     /**
@@ -24,12 +24,12 @@ export default class Cube extends BaseGroup {
      * @param event
      */
     onClick(type, event) {
-        if (this.sceneCollection.input.isPointingAt(this._mesh)) {
+        if (this.scene.controller.isPointingAt(this._mesh)) {
             var props = {
                 target: this._mesh,
                 duration: 3000
             };
-            this.tweener.animatePosition( this._mesh.position, new THREE.Vector3(Math.random() * 15, Math.random() * 15, Math.random() * 15), props );
+            this.animation.animatePosition( this._mesh.position, new THREE.Vector3(Math.random() * 15, Math.random() * 15, Math.random() * 15), props );
         }
     }
 
@@ -39,7 +39,7 @@ export default class Cube extends BaseGroup {
      */
     onRender(time) {
         this._mesh.rotation.y += .01;
-        var pointing = this.sceneCollection.input.isPointingAt(this._mesh);
+        var pointing = this._scene.controller.isPointingAt(this._mesh);
         if (pointing !== this._pointingAt) {
             if (pointing) {
                 this._mesh.scale.set(1.05, 1.05, 1.05);

@@ -89,12 +89,12 @@ export default class Daydream extends BaseInput {
      * get orientation of device
      */
     get orientation() {
-        var q = new THREE.Quaternion();
-        var sf = this._sensorfusion.getQuaternion();
-        q = q.fromArray(sf);
-        //var offset = new THREE.Quaternion( Math.PI/2, 0, 0);
-        //q = q.multiply(offset);
-        return q;
+        if (!this.connected) {
+            return new THREE.Quaternion();
+        }
+        var q1 = new THREE.Quaternion().fromArray(this._sensorfusion.getQuaternion());
+        var q2 = new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI/2, 0, 0));
+        return q2.multiply(q1);
     }
 
     /**
@@ -107,7 +107,7 @@ export default class Daydream extends BaseInput {
         }
 
         var m = new THREE.Matrix4().makeRotationFromQuaternion(this.orientation);
-        var direction = new THREE.Vector3(0, 0, 1);
+        var direction = new THREE.Vector3(0, 0, -1);
         direction = direction.applyMatrix4(m);
 
         var raycaster = new THREE.Raycaster();
@@ -123,27 +123,12 @@ export default class Daydream extends BaseInput {
     }
 
     createButton() {
-        var button = document.createElement('img');
-        button.className = 'daydream-button';
-        button.src = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgOCAyNCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgOCAyNDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+LnN0MHtmaWxsOm5vbmU7c3Ryb2tlOiNGRkZGRkY7c3Ryb2tlLW1pdGVybGltaXQ6MTA7fS5zdDF7ZmlsbDpub25lO3N0cm9rZTojRkZGRkZGO3N0cm9rZS1taXRlcmxpbWl0OjEwO30uc3Qye2ZpbGw6I0ZGRkZGRjt9PC9zdHlsZT48cGF0aCBjbGFzcz0ic3QwIiBkPSJNMCwzLjdDMCwxLjcsMS43LDAsMy43LDBzMy44LDEuNywzLjgsMy44djE1LjZjMCwyLjEtMS43LDMuOC0zLjgsMy44UzAsMjEuNCwwLDE5LjNWMy43eiIvPjxjaXJjbGUgY2xhc3M9InN0MSIgY3g9IjMuNyIgY3k9IjkuNSIgcj0iMS41Ii8+PGNpcmNsZSBjbGFzcz0ic3QxIiBjeD0iMy43IiBjeT0iMTMuMSIgcj0iMS41Ii8+PGNpcmNsZSBjbGFzcz0ic3QyIiBjeD0iMy43IiBjeT0iMy43IiByPSIzLjciLz48L3N2Zz4=';
+        var button = document.createElement('button');
+        button.className = 'a-enter-vr-button';
         button.title = 'Connect to Daydream Controller';
         var s = button.style;
-        s.position = 'absolute';
-        s.width = '24px';
-        s.height = '24px';
-        s.backgroundSize = 'cover';
-        s.backgroundColor = 'transparent';
-        s.border = 0;
-        s.userSelect = 'none';
-        s.webkitUserSelect = 'none';
-        s.MozUserSelect = 'none';
-        s.cursor = 'pointer';
-        s.padding = '12px';
-        s.zIndex = 1;
-        s.display = 'inline-block';
-        s.boxSizing = 'content-box';
-        s.bottom = 0;
-        s.left = 0;
+        s.left = '30px';
+        s.background = 'url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDIxLjAuMiwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCA1MCAzMCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgNTAgMzA7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPHN0eWxlIHR5cGU9InRleHQvY3NzIj4KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojRkZGRkZGO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1taXRlcmxpbWl0OjEwO30KCS5zdDF7ZmlsbDojRkZGRkZGO30KPC9zdHlsZT4KPHBhdGggY2xhc3M9InN0MCIgZD0iTTM4LjMsOC40YzMuNSwwLDYuNSwzLDYuNSw2LjVzLTMsNi43LTYuNyw2LjdsLTI3LjYsMGMtMy43LDAtNi43LTMtNi43LTYuN2MwLTMuNywzLjItNi41LDYuOS02LjVMMzguMyw4LjR6IgoJLz4KPGNpcmNsZSBjbGFzcz0ic3QxIiBjeD0iMjguMSIgY3k9IjE0LjkiIHI9IjIuNyIvPgo8Y2lyY2xlIGNsYXNzPSJzdDEiIGN4PSIyMS43IiBjeT0iMTQuOSIgcj0iMi43Ii8+CjxjaXJjbGUgY2xhc3M9InN0MSIgY3g9IjM4LjMiIGN5PSIxNC45IiByPSI2LjUiLz4KPC9zdmc+Cg==") 50% 50%/70% 70% no-repeat rgba(0,0,0,.35)';
 
         // Prevent button from being selected and dragged.
         button.draggable = false;
@@ -162,6 +147,6 @@ export default class Daydream extends BaseInput {
         // assign click event
         button.addEventListener('click', e => this.onConnectController(e));
 
-        document.body.appendChild(button);
+        document.querySelector('.a-enter-vr').appendChild(button);
     };
 }

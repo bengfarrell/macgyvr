@@ -40,6 +40,7 @@ export default class BaseGroup {
      */
     create(scene) {
         this._group.name = this.name;
+        this._scene = scene;
         scene.object3D.add(this._group);
 
         if (this._config && this._config.assets) {
@@ -96,8 +97,8 @@ export default class BaseGroup {
      * get scene
      * @returns {THREE.Object3D}
      */
-    get sceneCollection() {
-        return this._sceneCollection;
+    get scene() {
+        return this._scene;
     }
 
     /**
