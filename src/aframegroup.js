@@ -4,10 +4,23 @@ export default class AFrameGroup extends BaseGroup {
     constructor(markup) {
         super();
         this._agroup = document.createElement('a-entity');
-        this._agroup.innerHTML = markup;
+        if (markup) {
+            this._agroup.innerHTML = markup;
+        }
         this._group = this._agroup.object3D;
-        document.body.appendChild(this._agroup);
+
+    }
+
+    /**
+     * on create scene (or earliest possible opportunity)
+     * @param scene
+     */
+    create(scene) {
+        scene.appendChild(this._agroup);
         this.onInitialize(this._config);
+
+        super.create(scene);
+        this._agroup.id = this.name;
     }
 
 }
