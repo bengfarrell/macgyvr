@@ -1,3 +1,5 @@
+import AFrameGroup from './aframegroup.js';
+
 export default class BaseApplication {
     constructor(ascene, cfg) {
         if (!cfg) {
@@ -32,7 +34,13 @@ export default class BaseApplication {
         }
         for (var c in grouplist) {
             grouplist[c].addedToScene(this._ascene);
-            this._ascene.addBehavior(grouplist[c]);
+
+            if (grouplist[c].group) {
+                this._ascene.appendChild(grouplist[c].group);
+                this._ascene.addBehavior(grouplist[c]);
+            } else {
+                this._ascene.appendChild(grouplist[c]);
+            }
         }
     }
 

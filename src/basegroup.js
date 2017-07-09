@@ -10,7 +10,6 @@ export default class BaseGroup {
         this._config = params;
         this._childgroups = [];
         this._isAddedToScene = false;
-        this.isMacgyvrGroup = true;
 
         this.el = { isPlaying: true };
 
@@ -62,12 +61,11 @@ export default class BaseGroup {
             this._isAddedToScene = true;
             this._group.name = this.name;
             this._scene = scene;
-            scene.object3D.add(this._group);
             this.onAdded();
         }
 
         for (let c = 0; c < this._childgroups.length; c++) {
-            this._childgroups.addedToScene();
+            this._childgroups[c].addedToScene();
         }
     }
 
@@ -80,15 +78,15 @@ export default class BaseGroup {
         if (!name) {
             name = this.name + '-child';
         }
-        object.name = name;
+        object.group.name = name;
 
-        if (object.isMacgyvrGroup) {
+        /*if (object) {
             this._childgroups.push(object);
             this._group.add(object.group);
         } else {
             this._group.add(object);
         }
-        return object;
+        return object;*/
     }
 
     /**

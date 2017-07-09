@@ -21,7 +21,6 @@ export default class AFrameGroup extends BaseGroup {
     }
 
     addedToScene(scene) {
-        scene.appendChild(this._agroup);
         this._agroup.id = this.name;
         super.addedToScene(scene);
     }
@@ -57,13 +56,17 @@ export default class AFrameGroup extends BaseGroup {
     }
 
     add(element, name) {
-        if (element.isMacgyvrGroup) {
-            // not an element, but a group object, pass through to base class
-            super.add(element, name);
-        } else {
+        if (element instanceof HTMLElement) {
             this._agroup.appendChild(element);
             return element;
         }
+
+        if (element instanceof AFrameGroup) {
+            this._childgroups.push(element);
+            this._agroup.appendChild(element.group);
+            return element;
+        }
+        super.add(element, name);
     }
 
 }
