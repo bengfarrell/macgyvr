@@ -7,11 +7,18 @@ export default class BaseGroup {
          * @private
          */
         this._group = new THREE.Group();
-
         this._config = params;
-        this.onInitialize(params);
+        this._childgroups = [];
+        this._isAddedToScene = false;
+        this.isMacgyvrGroup = true;
 
         this.el = { isPlaying: true };
+
+        this.init();
+    }
+
+    init() {
+        this.onCreate(this.config);
     }
 
     /**
@@ -22,58 +29,50 @@ export default class BaseGroup {
     }
 
     /**
+     * get app config
+     * @returns {*}
+     */
+    get appConfig() {
+        return this._scene.appConfig;
+    }
+
+    /**
+     * get config
+     * @returns {*}
+     */
+    get config() {
+        return this._config;
+    }
+
+    /**
      * overridable methods
      * leave empty to be a simple abstraction we don't have to call super on
      * @param scene
      */
-    onCreate(scene) {};
+    onAdded(scene) {};
     onRender(scene, time) {};
-    onInitialize(params) {};
-    onAssetsLoaded(geometry, material) {};
-    onJSONSceneLoadProgress(progress) {};
-    onJSONSceneLoadError(err) {};
-    onJSONSceneLoaded(scene) { this.add(scene) };
+    onCreate(params) {};
 
     /**
-     * on create scene (or earliest possible opportunity)
+     * on added to scene
      * @param scene
      */
-    create(scene) {
-        this._group.name = this.name;
-        this._scene = scene;
-        scene.object3D.add(this._group);
-
-        if (this._config && this._config.assets) {
-            // todo: determine when to use JSON Loader, OBJ loader, or whatever
-            var loader = new THREE.JSONLoader();
-            loader.load(this._config.assets, (geometry, materials) => {
-                this.onAssetsLoaded(geometry, materials);
-            });
+    addedToScene(scene) {
+        if (!this._isAddedToScene) {
+            this._isAddedToScene = true;
+            this._group.name = this.name;
+            this._scene = scene;
+            scene.object3D.add(this._group);
+            this.onAdded();
         }
 
-        if (this._config && this._config.geometry) {
-            var loader = new THREE.BufferGeometryLoader();
-            loader.load(this._config.geometry, (geometry) => {
-                this.onAssetsLoaded(geometry);
-            });
+        for (let c = 0; c < this._childgroups.length; c++) {
+            this._childgroups.addedToScene();
         }
-
-        if (this._config && this._config.scene) {
-            var loader = new THREE.ObjectLoader();
-            loader.load(this._config.scene, (loaded) => {
-                this.onJSONSceneLoaded(loaded);
-            }, (progress) => {
-                this.onJSONSceneLoadProgress(progress);
-            }, (err) => {
-                this.onJSONSceneLoadError(err);
-            });
-        }
-
-        this.onCreate();
     }
 
     /**
-     * add object to scene
+     * add object to parent
      * @param object
      * @param name
      */
@@ -82,7 +81,14 @@ export default class BaseGroup {
             name = this.name + '-child';
         }
         object.name = name;
-        this._group.add(object);
+
+        if (object.isMacgyvrGroup) {
+            this._childgroups.push(object);
+            this._group.add(object.group);
+        } else {
+            this._group.add(object);
+        }
+        return object;
     }
 
     /**
