@@ -107,10 +107,11 @@ export default class BaseGroup {
 
     /**
      * get children of this group
+     * (note: unsure if this should be objects or to mix in real threejs groups and aframe entities with this call - for now just macgyvr based object)
      * @returns {Array}
      */
     get children() {
-        return this._group.children;
+        return this._childgroups;
     }
 
     /**
