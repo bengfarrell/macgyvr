@@ -6,5 +6,16 @@ export default {
             el.setAttribute(key, attributes[c]);
         }
         return el;
+    },
+
+    addAnimation(parent, props, cleanWhenDone) {
+        let el = this.createNode('a-animation', props);
+        if (cleanWhenDone) {
+            el.addEventListener('animationend', function () {
+                el.parentNode.removeChild(el);
+            });
+        }
+        parent.appendChild(el);
+        return el;
     }
 }
