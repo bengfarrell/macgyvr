@@ -1,5 +1,5 @@
-import BaseGroup from './basegroup.js';
-import AFrameUtils from './utils/aframe.js';
+import BaseGroup from '../basegroup.js';
+import AFrameUtils from './aframe.js';
 
 export default class AFrameGroup extends BaseGroup {
     constructor(config) {

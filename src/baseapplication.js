@@ -1,49 +1,102 @@
-import AFrameGroup from './aframegroup.js';
-
 export default class BaseApplication {
-    constructor(ascene, cfg) {
+    constructor(el, cfg) {
         if (!cfg) {
             cfg = {};
         }
-        this._ascene = ascene;
-        this._ascene.appConfig = cfg;
-        this._ascene.addBehavior(this);
-        this.el = { isPlaying: true };
-        this.onCreate(ascene);
+        this.element = el;
+        this.engine = new BABYLON.Engine(this.element, true);
+        this.scene = new BABYLON.Scene(this.engine);
+        this.appConfig = cfg;
+        this.root = null;
+        this.isApplication = true;
+        this.children = [];
+        this.engine.runRenderLoop( () => this.tick() );
+        this.onCreate(this.scene);
+
+        this.cameras = [];
+        this.lights = [];
+
+        if (cfg.camera) {
+            this.addCamera(cfg.camera);
+        }
+
+        if (cfg.lights) {
+            this.addLights(cfg.lights);
+        }
+
+        if (cfg.inspector) {
+            document.addEventListener('keydown', e => this.onKeyDown(e) );
+        }
+
+        this.initialized = true;
+    }
+
+    /**
+     * convenience method to add a typical camera
+     */
+    addCamera() {
+        let camera = new BABYLON.FreeCamera('camera', new BABYLON.Vector3(0, 0, 0), this.scene);
+        camera.setTarget(BABYLON.Vector3.Zero());
+        camera.attachControl(this.element, true);
+        this.cameras.push(camera);
+    }
+
+    /**
+     * convenience method to add a typical light
+     */
+    addLights() {
+        let light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), this.scene);
+        light.intensity = 0.7;
+
     }
 
     get config() {
-        return this._ascene.appConfig;
+        return this.appConfig;
     }
 
     /**
-     * a-frame tick
-     * @param time
+     * render engine tick
      */
-    tick(time) {
-        this.onRender(time)
+    tick() {
+        if (this.initialized && this.cameras.length > 0) {
+            this.scene.render();
+            this.onRender(this.engine.getDeltaTime());
+        }
     }
 
     /**
-     * add objects to scene
+     * add objects to application group
      * @param grouplist
      */
     add(grouplist) {
+        if (!this.root) {
+            this.root = new BABYLON.Mesh('root', this.scene);
+        }
         if (grouplist.length === undefined) {
             grouplist = [grouplist];
         }
-        for (var c in grouplist) {
-            grouplist[c].addedToScene(this._ascene);
+        for (let c in grouplist) {
+            grouplist[c].parent = this.root;
+            this.children.push(grouplist[c]);
 
-            if (grouplist[c].group) {
-                this._ascene.appendChild(grouplist[c].group);
-                this._ascene.addBehavior(grouplist[c]);
-            } else {
-                this._ascene.appendChild(grouplist[c]);
+            if (grouplist[c].onParented) {
+                grouplist[c].onParented(this.scene, this.root);
             }
         }
     }
 
-    onCreate(ascene) {}
+    onKeyDown(e) {
+        if (this.config.inspector) {
+            if (e.keyCode === this.config.inspector || String.fromCharCode(e.keyCode).toLowerCase() === this.config.inspector ) {
+                if (this.scene.debugLayer.isVisible()) {
+                    this.scene.debugLayer.hide();
+                } else {
+                    this.scene.debugLayer.show();
+                }
+            }
+        }
+    }
+
+    onCreate(sceneEl) {}
     onRender(time) {}
 }

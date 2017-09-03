@@ -1,19 +1,7 @@
 export default class BaseGroup {
     constructor(params) {
-
-        /**
-         * parent group of child objects we will create
-         * @type {THREE.Object3D}
-         * @private
-         */
-        this._group = new THREE.Group();
         this._config = params;
-        this._childgroups = [];
-        this._isAddedToScene = false;
-
-        this.el = { isPlaying: true };
-
-        this.init();
+        this._children = [];
     }
 
     init() {
@@ -43,50 +31,41 @@ export default class BaseGroup {
         return this._config;
     }
 
+    onParented(scene, parent) {
+        this._scene = scene;
+        this._group = new BABYLON.Mesh(this.constructor.name + '-group', this._scene);
+        this._scene._engine.runRenderLoop( () => this.tick() );
+        this.onCreate(scene, parent);
+    }
+
     /**
      * overridable methods
      * leave empty to be a simple abstraction we don't have to call super on
      * @param scene
      */
-    onAdded(scene) {};
     onRender(scene, time) {};
     onCreate(params) {};
 
     /**
-     * on added to scene
-     * @param scene
-     */
-    addedToScene(scene) {
-        if (!this._isAddedToScene) {
-            this._isAddedToScene = true;
-            this._group.name = this.name;
-            this._scene = scene;
-            this.onAdded();
-        }
-
-        for (let c = 0; c < this._childgroups.length; c++) {
-            this._childgroups[c].addedToScene();
-        }
-    }
-
-    /**
      * add object to parent
      * @param object
-     * @param name
      */
-    add(object, name) {
-        if (!name) {
-            name = this.name + '-child';
+    add(object) {
+        this._children.push(object);
+        if (object.onParented) {
+            object.onParented(this._scene, this._group);
         }
-        object.group.name = name;
+        return object;
+    }
 
-        /*if (object) {
-            this._childgroups.push(object);
-            this._group.add(object.group);
-        } else {
-            this._group.add(object);
+    get application() {
+        let parent = this.parent;
+        while (parent) {
+            if (parent.isApplication) {
+                return parent;
+            }
+            parent = parent.parent;
         }
-        return object;*/
     }
 
     /**
@@ -111,20 +90,14 @@ export default class BaseGroup {
      * @returns {Array}
      */
     get children() {
-        return this._childgroups;
+        return this._children;
     }
-
-    /**
-     * on prerender scene
-     * @param scene
-     */
-    preRender() {}
 
     /**
      * on a-frame component tick
      * @param time
      */
     tick(time) {
-        this.onRender(time);
+        this.onRender(this.scene._engine.getDeltaTime());
     }
 }
