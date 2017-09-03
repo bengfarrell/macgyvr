@@ -50,12 +50,24 @@ export default class BaseGroup {
      * add object to parent
      * @param object
      */
-    add(object) {
-        this._children.push(object);
-        if (object.onParented) {
-            object.onParented(this._scene, this._group);
+    add(objects) {
+        let asArray = true;
+        if (objects.length === undefined) {
+            objects = [objects];
+            asArray = false;
         }
-        return object;
+        for (let c = 0; c < objects.length; c++) {
+            this._children.push(objects[c]);
+            if (objects[c].onParented) {
+                objects[c].onParented(this._scene, this._group);
+            }
+        }
+
+        if (asArray) {
+            return objects;
+        } else {
+            return objects[0];
+        }
     }
 
     get application() {

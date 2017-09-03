@@ -72,8 +72,10 @@ export default class BaseApplication {
         if (!this.root) {
             this.root = new BABYLON.Mesh('root', this.scene);
         }
+        let asArray = true;
         if (grouplist.length === undefined) {
             grouplist = [grouplist];
+            asArray = false;
         }
         for (let c in grouplist) {
             grouplist[c].parent = this.root;
@@ -82,6 +84,12 @@ export default class BaseApplication {
             if (grouplist[c].onParented) {
                 grouplist[c].onParented(this.scene, this.root);
             }
+        }
+
+        if (asArray) {
+            return grouplist;
+        } else {
+            return grouplist[0];
         }
     }
 
