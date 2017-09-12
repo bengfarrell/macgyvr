@@ -2,6 +2,7 @@ export default class BaseGroup {
     constructor(params) {
         this._config = params;
         this._children = [];
+        this.isGroup = true;
     }
 
     init() {
@@ -31,9 +32,12 @@ export default class BaseGroup {
         return this._config;
     }
 
+    initializeGroup(scene) {
+        this._group = new BABYLON.Mesh(this.constructor.name + '-group', scene);
+    }
+
     onParented(scene, parent) {
         this._scene = scene;
-        this._group = new BABYLON.Mesh(this.constructor.name + '-group', this._scene);
         this._scene._engine.runRenderLoop( () => this.tick() );
         this.onCreate(scene, parent);
     }
@@ -57,6 +61,14 @@ export default class BaseGroup {
             asArray = false;
         }
         for (let c = 0; c < objects.length; c++) {
+            if (objects[c].isGroup) {
+                if (!objects[c].group) {
+                    objects[c].initializeGroup(this.scene);
+                }
+                objects[c].group.parent = this._group;
+            } else {
+                objects[c].parent = this._group;
+            }
             this._children.push(objects[c]);
             if (objects[c].onParented) {
                 objects[c].onParented(this._scene, this._group);

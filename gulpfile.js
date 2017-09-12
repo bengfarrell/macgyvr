@@ -16,6 +16,7 @@ gulp.task('dev', function() {
         './node_modules/browser-es-module-loader/dist/babel-browser-build.js',
         './node_modules/browser-es-module-loader/dist/browser-es-module-loader.js',
         './node_modules/babylonjs/dist/preview release/babylon.js',
+        './extras/babylon.glTF2FileLoader.min.js'
     ])
         .pipe(concat('macgyvr-full-dev.js'))
         .pipe(gulp.dest('./'));
@@ -27,6 +28,7 @@ gulp.task('dev', function() {
 gulp.task('dist', function() {
     return gulp.src([
         './node_modules/babylonjs/dist/preview release/babylon.js',
+        './extras/babylon.glTF2FileLoader.min.js'
     ])
         .pipe(concat('macgyvr-full.js'))
         .pipe(gulp.dest('./'));

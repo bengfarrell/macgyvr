@@ -66,30 +66,37 @@ export default class BaseApplication {
 
     /**
      * add objects to application group
-     * @param grouplist
+     * @param objects
      */
-    add(grouplist) {
+    add(objects) {
         if (!this.root) {
-            this.root = new BABYLON.Mesh('root', this.scene);
+            this.root = new BABYLON.Mesh('application-root', this.scene);
         }
         let asArray = true;
-        if (grouplist.length === undefined) {
-            grouplist = [grouplist];
+        if (objects.length === undefined) {
+            objects = [objects];
             asArray = false;
         }
-        for (let c in grouplist) {
-            grouplist[c].parent = this.root;
-            this.children.push(grouplist[c]);
+        for (let c in objects) {
+            if (objects[c].isGroup) {
+                if (!objects[c].group) {
+                    objects[c].initializeGroup(this.scene);
+                }
+                objects[c].group.parent = this.root;
+            } else {
+                objects[c].parent = this.root;
+            }
+            this.children.push(objects[c]);
 
-            if (grouplist[c].onParented) {
-                grouplist[c].onParented(this.scene, this.root);
+            if (objects[c].onParented) {
+                objects[c].onParented(this.scene, this.root);
             }
         }
 
         if (asArray) {
-            return grouplist;
+            return objects;
         } else {
-            return grouplist[0];
+            return objects[0];
         }
     }
 
