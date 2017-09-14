@@ -17,7 +17,7 @@ export default class BaseApplication {
         this.lights = [];
 
         if (cfg.camera) {
-            this.addCamera(cfg.camera);
+            this.addCamera(cfg.camera.type, cfg.camera.position);
         }
 
         if (cfg.lights) {
@@ -36,10 +36,32 @@ export default class BaseApplication {
     /**
      * convenience method to add a typical camera
      */
-    addCamera() {
-        let camera = new BABYLON.FreeCamera('camera', new BABYLON.Vector3(0, 0, 0), this.scene);
-        camera.setTarget(BABYLON.Vector3.Zero());
-        camera.attachControl(this.element, true);
+    addCamera(type, position) {
+        if (!type) {
+            type = 'freecamera';
+        }
+
+        if (!position) {
+            position = new BABYLON.Vector3(0, 0, 0)
+        }
+
+        let camera;
+        switch (type) {
+            case 'freecamera':
+                camera = new BABYLON.FreeCamera('camera', position, this.scene);
+                camera.setTarget(BABYLON.Vector3.Zero());
+                camera.attachControl(this.element, true);
+                break;
+
+            case 'arcrotate':
+                camera = new BABYLON.ArcRotateCamera("ArcRotateCamera", 0, 0, 0, BABYLON.Vector3.Zero(), this.scene);
+                camera.attachControl(this.element, true);
+                camera.setPosition(position);
+                break;
+
+            default:
+                console.error('Camera not added, ', type, ' is not found');
+        }
         this.cameras.push(camera);
     }
 
