@@ -28,6 +28,8 @@ export default class BaseApplication {
             document.addEventListener('keydown', e => this.onKeyDown(e) );
         }
 
+        window.addEventListener('resize', () => this.onResize());
+
         this.initialized = true;
     }
 
@@ -110,6 +112,10 @@ export default class BaseApplication {
                 }
             }
         }
+    }
+
+    onResize() {
+        this.engine.resize();
     }
 
     onCreate(sceneEl) {}

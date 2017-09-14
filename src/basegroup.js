@@ -1,5 +1,7 @@
-export default class BaseGroup {
+import EventListener from './utils/eventlistener.js';
+export default class BaseGroup extends EventListener {
     constructor(params) {
+        super();
         this._config = params;
         this._children = [];
         this.isGroup = true;
