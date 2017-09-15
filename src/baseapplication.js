@@ -1,12 +1,13 @@
+import BaseConfig from './baseconfig.js';
+
 export default class BaseApplication {
     constructor(el, cfg) {
-        if (!cfg) {
-            cfg = {};
-        }
+        this.appConfig = BaseConfig.apply(cfg);
         this.element = el;
-        this.engine = new BABYLON.Engine(this.element, true);
+        this.engine = new BABYLON.Engine(this.element, this.appConfig.engine.antialias, this.appConfig.engine.options);
+        this.engine.enableOfflineSupport = false;
         this.scene = new BABYLON.Scene(this.engine);
-        this.appConfig = cfg;
+
         this.root = null;
         this.isApplication = true;
         this.children = [];
@@ -16,15 +17,15 @@ export default class BaseApplication {
         this.cameras = [];
         this.lights = [];
 
-        if (cfg.camera) {
-            this.addCamera(cfg.camera.type, cfg.camera.position);
+        if (this.appConfig.camera) {
+            this.addCamera(this.appConfig.camera.type, this.appConfig.camera.position);
         }
 
-        if (cfg.lights) {
-            this.addLights(cfg.lights);
+        if (this.appConfig.lights) {
+            this.addLights(this.appConfig.lights);
         }
 
-        if (cfg.inspector) {
+        if (this.appConfig.inspector) {
             document.addEventListener('keydown', e => this.onKeyDown(e) );
         }
 
