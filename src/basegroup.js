@@ -34,8 +34,11 @@ export default class BaseGroup extends EventListener {
         return this._config;
     }
 
-    initializeGroup(scene) {
-        this._group = new BABYLON.Mesh(this.constructor.name + '-group', scene);
+    initializeGroup(scene, name) {
+        if (!name) {
+            name = this.constructor.name + '-group';
+        }
+        this._group = new BABYLON.Mesh(name, scene);
     }
 
     onParented(scene, parent) {
@@ -84,6 +87,41 @@ export default class BaseGroup extends EventListener {
         }
     }
 
+    remove(objects) {
+        let asArray = true;
+        if (objects.length === undefined) {
+            objects = [objects];
+            asArray = false;
+        }
+
+        this._children = this.children.filter(val => !objects.includes(val));
+        for (let c = 0; c < objects.length; c++) {
+            this.scene.removeMesh(objects[c]);
+        }
+
+        if (asArray) {
+            return objects;
+        } else {
+            return objects[0];
+        }
+    }
+
+    removeAll() {
+        for (let c = 0; c < this._children.length; c++) {
+            this._children[c].dispose();
+        }
+        this._children = [];
+    }
+
+    find(name) {
+        for (let c = 0; c < this._children.length; c++) {
+            if (this._children[c].name === name) {
+                return this._children[c];
+            }
+        }
+        return null;
+    }
+
     get application() {
         let parent = this.parent;
         while (parent) {
@@ -112,7 +150,6 @@ export default class BaseGroup extends EventListener {
 
     /**
      * get children of this group
-     * (note: unsure if this should be objects or to mix in real threejs groups and aframe entities with this call - for now just macgyvr based object)
      * @returns {Array}
      */
     get children() {

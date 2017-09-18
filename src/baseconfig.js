@@ -1,5 +1,8 @@
 export default {
     default: {
+        scene: {
+           useRightHandedSystem: false,
+        },
         engine: {
             antialias: true,
             options: {}

@@ -1,4 +1,5 @@
 import BaseConfig from './baseconfig.js';
+import BaseGroup from './basegroup.js';
 
 export default class BaseApplication {
     constructor(el, cfg) {
@@ -7,10 +8,14 @@ export default class BaseApplication {
         this.engine = new BABYLON.Engine(this.element, this.appConfig.engine.antialias, this.appConfig.engine.options);
         this.engine.enableOfflineSupport = false;
         this.scene = new BABYLON.Scene(this.engine);
+        this.scene.useRightHandedSystem = this.appConfig.scene.useRightHandedSystem;
 
-        this.root = null;
+        this.root = new BaseGroup();
+        this.root.initializeGroup(this.scene, 'application-root');
+        this.root.onParented(this.scene, this);
+
         this.isApplication = true;
-        this.children = [];
+        this._children = [];
         this.engine.runRenderLoop( () => this.tick() );
         this.onCreate(this.scene);
 
@@ -89,14 +94,16 @@ export default class BaseApplication {
         }
     }
 
+    add(objects) { return this.root.add(objects); }
+    remove(objects) { return this.root.remove(objects); }
+    removeAll(objects) { this.root.removeAll(objects); }
+    find(name) { return this.root.find(name); }
+
     /**
      * add objects to application group
      * @param objects
      */
-    add(objects) {
-        if (!this.root) {
-            this.root = new BABYLON.Mesh('application-root', this.scene);
-        }
+    /*add(objects) {
         let asArray = true;
         if (objects.length === undefined) {
             objects = [objects];
@@ -107,11 +114,11 @@ export default class BaseApplication {
                 if (!objects[c].group) {
                     objects[c].initializeGroup(this.scene);
                 }
-                objects[c].group.parent = this.root;
+                objects[c].group.parent = this.root.group;
             } else {
-                objects[c].parent = this.root;
+                objects[c].parent = this.root.group;
             }
-            this.children.push(objects[c]);
+            this._children.push(objects[c]);
 
             if (objects[c].onParented) {
                 objects[c].onParented(this.scene, this.root);
@@ -123,7 +130,33 @@ export default class BaseApplication {
         } else {
             return objects[0];
         }
+    }*/
+
+    /*remove(objects) {
+        let asArray = true;
+        if (objects.length === undefined) {
+            objects = [objects];
+            asArray = false;
+        }
+
+        this._children = this._children.filter(val => !objects.includes(val));
+        for (let c = 0; c < objects.length; c++) {
+            objects[c].dispose();
+        }
+
+        if (asArray) {
+            return objects;
+        } else {
+            return objects[0];
+        }
     }
+
+    removeAll() {
+        for (let c = 0; c < this._children.length; c++) {
+            this._children[c].dispose();
+        }
+        this._children = [];
+    }*/
 
     onKeyDown(e) {
         if (this.config.inspector) {
@@ -139,6 +172,14 @@ export default class BaseApplication {
 
     onResize() {
         this.engine.resize();
+    }
+
+    /**
+     * get children of this group
+     * @returns {Array}
+     */
+    get children() {
+        return this._children;
     }
 
     onCreate(sceneEl) {}
