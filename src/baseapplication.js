@@ -37,6 +37,7 @@ export default class BaseApplication {
         window.addEventListener('resize', () => this.onResize());
 
         this.initialized = true;
+
     }
 
     /**
@@ -98,65 +99,6 @@ export default class BaseApplication {
     remove(objects) { return this.root.remove(objects); }
     removeAll(objects) { this.root.removeAll(objects); }
     find(name) { return this.root.find(name); }
-
-    /**
-     * add objects to application group
-     * @param objects
-     */
-    /*add(objects) {
-        let asArray = true;
-        if (objects.length === undefined) {
-            objects = [objects];
-            asArray = false;
-        }
-        for (let c in objects) {
-            if (objects[c].isGroup) {
-                if (!objects[c].group) {
-                    objects[c].initializeGroup(this.scene);
-                }
-                objects[c].group.parent = this.root.group;
-            } else {
-                objects[c].parent = this.root.group;
-            }
-            this._children.push(objects[c]);
-
-            if (objects[c].onParented) {
-                objects[c].onParented(this.scene, this.root);
-            }
-        }
-
-        if (asArray) {
-            return objects;
-        } else {
-            return objects[0];
-        }
-    }*/
-
-    /*remove(objects) {
-        let asArray = true;
-        if (objects.length === undefined) {
-            objects = [objects];
-            asArray = false;
-        }
-
-        this._children = this._children.filter(val => !objects.includes(val));
-        for (let c = 0; c < objects.length; c++) {
-            objects[c].dispose();
-        }
-
-        if (asArray) {
-            return objects;
-        } else {
-            return objects[0];
-        }
-    }
-
-    removeAll() {
-        for (let c = 0; c < this._children.length; c++) {
-            this._children[c].dispose();
-        }
-        this._children = [];
-    }*/
 
     onKeyDown(e) {
         if (this.config.inspector) {
