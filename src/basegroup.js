@@ -19,6 +19,13 @@ export default class BaseGroup extends EventListener {
     }
 
     /**
+     * get babylon scene
+     */
+    get scene() {
+        return this._scene;
+    }
+
+    /**
      * get app config
      * @returns {*}
      */
