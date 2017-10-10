@@ -10,14 +10,8 @@ export default class BaseApplication {
         this.scene = new BABYLON.Scene(this.engine);
         this.scene.useRightHandedSystem = this.appConfig.scene.useRightHandedSystem;
 
-        this.root = new BaseGroup();
-        this.root.initializeGroup(this.scene, 'application-root');
-        this.root.onParented(this.scene, this);
-
         this.isApplication = true;
-        this._children = [];
         this.engine.runRenderLoop( () => this.tick() );
-        this.onCreate(this.scene);
 
         this.cameras = [];
         this.lights = [];
@@ -33,12 +27,19 @@ export default class BaseApplication {
         if (this.appConfig.inspector) {
             document.addEventListener('keydown', e => this.onKeyDown(e) );
         }
+        this.root = new BaseGroup();
+        this.root.parent = this;
+        this.root.initializeGroup(this.scene, 'application-root');
+        this.root.onParented(this.scene, this, this.element);
+        this.onCreate(this.scene);
 
         window.addEventListener('resize', () => this.onResize());
 
         this.initialized = true;
 
     }
+
+    get name() { return 'root'; }
 
     /**
      * convenience method to add a typical camera
@@ -95,6 +96,29 @@ export default class BaseApplication {
         }
     }
 
+    /**
+     * replace all scenes starting with application and spidering through children, restarting all render loops
+     * @param scene
+     * @param children
+     */
+    replaceAllScenes(scene, children) {
+        if (!children) {
+            this.engine.stopRenderLoop();
+            this.engine.runRenderLoop( () => this.tick() );
+
+            this.scene = scene;
+            this.root.scene = scene;
+            children = this.root.children;
+        }
+        for (let c = 0; c < children.length; c++) {
+            if (children[c].isGroup) {
+                children[c].scene = scene;
+            }
+
+            this.replaceAllScenes(scene, children[c].children);
+        }
+    }
+
     add(objects) { return this.root.add(objects); }
     remove(objects) { return this.root.remove(objects); }
     removeAll(objects) { this.root.removeAll(objects); }
@@ -114,14 +138,6 @@ export default class BaseApplication {
 
     onResize() {
         this.engine.resize();
-    }
-
-    /**
-     * get children of this group
-     * @returns {Array}
-     */
-    get children() {
-        return this._children;
     }
 
     onCreate(sceneEl) {}

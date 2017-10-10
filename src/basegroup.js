@@ -19,18 +19,11 @@ export default class BaseGroup extends EventListener {
     }
 
     /**
-     * get babylon scene
-     */
-    get scene() {
-        return this._scene;
-    }
-
-    /**
      * get app config
      * @returns {*}
      */
     get appConfig() {
-        return this._scene.appConfig;
+        return this.application.appConfig;
     }
 
     /**
@@ -48,10 +41,10 @@ export default class BaseGroup extends EventListener {
         this._group = new BABYLON.Mesh(name, scene);
     }
 
-    onParented(scene, parent) {
-        this._scene = scene;
-        this._scene._engine.runRenderLoop( () => this.tick() );
-        this.onCreate(scene, parent);
+    onParented(scene, parent, canvas) {
+        this.scene = scene;
+        this._canvas = canvas;
+        this.onCreate(scene);
     }
 
     /**
@@ -77,13 +70,14 @@ export default class BaseGroup extends EventListener {
                 if (!objects[c].group) {
                     objects[c].initializeGroup(this.scene);
                 }
+                objects[c].parent = this;
                 objects[c].group.parent = this._group;
             } else {
                 objects[c].parent = this._group;
             }
             this._children.push(objects[c]);
             if (objects[c].onParented) {
-                objects[c].onParented(this._scene, this._group);
+                objects[c].onParented(this._scene, this._group, this._canvas);
             }
         }
 
@@ -147,12 +141,37 @@ export default class BaseGroup extends EventListener {
         return this._group;
     }
 
+    get canvas() {
+        return this._canvas;
+    }
+
     /**
-     * get scene
-     * @returns {THREE.Object3D}
+     * get engine
+     */
+    get engine() {
+        return this._scene._engine;
+    }
+
+    /**
+     * get babylon scene
      */
     get scene() {
         return this._scene;
+    }
+
+    /**
+     * set scene and rewire render loop for scene
+     * @param val
+     */
+    set scene(val) {
+        if (this.scene) {
+            //console.log(this.engine, this.name);
+        }
+        if (this._scene && this._scene._engine) {
+            this._scene._engine.stopRenderLoop();
+        }
+        this._scene = val;
+        this._scene._engine.runRenderLoop( () => this.tick() );
     }
 
     /**
@@ -164,10 +183,10 @@ export default class BaseGroup extends EventListener {
     }
 
     /**
-     * on a-frame component tick
-     * @param time
+     * render loop
      */
-    tick(time) {
+    tick() {
+        //console.log('tick', this.name)
         this.onRender(this.scene._engine.getDeltaTime());
     }
 }
