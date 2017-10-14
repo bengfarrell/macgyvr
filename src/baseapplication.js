@@ -44,19 +44,20 @@ export default class BaseApplication {
     /**
      * convenience method to add a typical camera
      */
-    addCamera(type, position) {
+    addCamera(type, options) {
         if (!type) {
             type = 'freecamera';
         }
 
-        if (!position) {
-            position = new BABYLON.Vector3(0, 0, 0)
+        if (!options.position) {
+            options.position = new BABYLON.Vector3(0, 0, 0);
         }
 
         let camera;
         switch (type) {
+            case 'default':
             case 'freecamera':
-                camera = new BABYLON.FreeCamera('camera', position, this.scene);
+                camera = new BABYLON.FreeCamera('camera', options.position, this.scene);
                 camera.setTarget(BABYLON.Vector3.Zero());
                 camera.attachControl(this.element, true);
                 break;
@@ -64,7 +65,7 @@ export default class BaseApplication {
             case 'arcrotate':
                 camera = new BABYLON.ArcRotateCamera("ArcRotateCamera", 0, 0, 0, BABYLON.Vector3.Zero(), this.scene);
                 camera.attachControl(this.element, true);
-                camera.setPosition(position);
+                camera.setPosition(options.position);
                 break;
 
             default:
