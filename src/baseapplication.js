@@ -36,8 +36,9 @@ export default class BaseApplication {
         window.addEventListener('resize', () => this.onResize());
 
         this.initialized = true;
-
     }
+
+    get canvas() { return this.element; }
 
     get name() { return 'root'; }
 
