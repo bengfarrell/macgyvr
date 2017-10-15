@@ -117,7 +117,9 @@ export default class BaseApplication {
                 children[c].scene = scene;
             }
 
-            this.replaceAllScenes(scene, children[c].children);
+            if (children[c].children && children[c].children.length > 0) {
+                this.replaceAllScenes(scene, children[c].children);
+            }
         }
     }
 
