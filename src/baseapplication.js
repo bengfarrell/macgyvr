@@ -17,7 +17,7 @@ export default class BaseApplication {
         this.lights = [];
 
         if (this.appConfig.camera) {
-            this.addCamera(this.appConfig.camera.type, this.appConfig.camera.position);
+            this.addCamera(this.appConfig.camera.type, this.appConfig.camera.options);
         }
 
         if (this.appConfig.lights) {
